@@ -28,6 +28,7 @@ EXTRA_PSR4 = {
     "sebastian/code-unit-reverse-lookup": {"SebastianBergmann\\CodeUnitReverseLookup\\": "src"},
     "phar-io/version": {"PharIo\\Version\\": "src"},
     "theseer/tokenizer": {"TheSeer\\Tokenizer\\": "src"},
+    "symfony/polyfill-php86": {},
 }
 
 EXTRA = {
@@ -119,6 +120,25 @@ def main():
             target = os.path.join(root, rel)
             if os.path.isfile(target):
                 files.append(target)
+
+        # polyfill classmap stubs declare global classes conditionally, so they
+        # must be loaded as files rather than mapped by class name. PHP 8.4
+        # already ships Attribute/Override/SortDirection, so only the stubs for
+        # features newer than the runtime are needed.
+        if not name.startswith("symfony/polyfill-php8"):
+            continue
+
+        if name != "symfony/polyfill-php86":
+            continue
+
+        for rel in meta.get("autoload", {}).get("classmap", []):
+            stub_dir = os.path.join(root, rel)
+            if not os.path.isdir(stub_dir):
+                continue
+            for dirpath, _dirs, filenames in os.walk(stub_dir):
+                for filename in sorted(filenames):
+                    if filename.endswith(".php"):
+                        files.append(os.path.join(dirpath, filename))
 
     # phpunit ships PEAR-style class names (PHPUnit\TextUI\Application in
     # src/TextUI/Application.php) which psr-4 covers, but its phar loader needs
