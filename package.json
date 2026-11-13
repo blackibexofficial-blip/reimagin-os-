@@ -3,9 +3,9 @@
     "private": true,
     "type": "module",
     "name": "reimagin-os",
-    "description": "Reimagin OS — Laravel admin panel, CMS, visual page builder and storefront.",
+    "description": "Reimagin OS \u2014 Laravel admin panel, CMS, visual page builder and storefront.",
     "scripts": {
-        "setup": "python3 tools/vendor/fetch.py && python3 tools/wasm/gen-autoload.py && node --experimental-wasm-jspi tools/wasm/artisan.mjs key:generate && node --experimental-wasm-jspi tools/wasm/artisan.mjs migrate --force",
+        "setup": "python3 tools/vendor/fetch.py && python3 tools/wasm/gen-autoload.py && node --experimental-wasm-jspi tools/wasm/artisan.mjs key:generate && node --experimental-wasm-jspi tools/wasm/artisan.mjs migrate --force && node --experimental-wasm-jspi tools/wasm/artisan.mjs db:seed --force",
         "build": "vite build",
         "dev": "vite",
         "serve": "node --experimental-wasm-jspi tools/wasm/serve.mjs",

@@ -69,6 +69,72 @@ class AdminModulesTest extends TestCase
         $this->actingAs($owner)->get($path)->assertOk();
     }
 
+    /** Create, edit and secondary screens, which need a record to edit. */
+    public static function formScreens(): array
+    {
+        return array_map(fn (string $path) => [$path], [
+            '/admin/pages/create',
+            '/admin/posts/create',
+            '/admin/services/create',
+            '/admin/testimonials/create',
+            '/admin/projects/create',
+            '/admin/products/create',
+            '/admin/categories/create',
+            '/admin/customers/create',
+            '/admin/leads/create',
+            '/admin/appointments/create',
+            '/admin/quotations/create',
+            '/admin/users/create',
+            '/admin/media/picker',
+        ]);
+    }
+
+    #[DataProvider('formScreens')]
+    public function test_a_create_screen_renders(string $path): void
+    {
+        $owner = User::query()->where('email', 'owner@reimaginos.test')->firstOrFail();
+
+        $this->actingAs($owner)->get($path)->assertOk();
+    }
+
+    /** Edit screens, resolved against the first row of the matching table. */
+    public static function editScreens(): array
+    {
+        return [
+            ['/admin/pages/1/edit', 'App\Models\Page'],
+            ['/admin/posts/1/edit', 'App\Models\BlogPost'],
+            ['/admin/services/1/edit', 'App\Models\Service'],
+            ['/admin/testimonials/1/edit', 'App\Models\Testimonial'],
+            ['/admin/projects/1/edit', 'App\Models\Project'],
+            ['/admin/products/1/edit', 'App\Models\Product'],
+            ['/admin/categories/1/edit', 'App\Models\Category'],
+            ['/admin/customers/1/edit', 'App\Models\Customer'],
+            ['/admin/leads/1/edit', 'App\Models\Lead'],
+            ['/admin/appointments/1/edit', 'App\Models\Appointment'],
+            ['/admin/users/1/edit', 'App\Models\User'],
+        ];
+    }
+
+    #[DataProvider('editScreens')]
+    public function test_an_edit_screen_renders(string $path, string $model): void
+    {
+        $owner = User::query()->where('email', 'owner@reimaginos.test')->firstOrFail();
+        $id = (int) $model::query()->value('id');
+
+        $this->actingAs($owner)
+            ->get(str_replace('1/', $id.'/', $path))
+            ->assertOk();
+    }
+
+    public function test_page_revisions_and_preview_render(): void
+    {
+        $owner = User::query()->where('email', 'owner@reimaginos.test')->firstOrFail();
+        $page = \App\Models\Page::query()->firstOrFail();
+
+        $this->actingAs($owner)->get(route('admin.pages.revisions', $page))->assertOk();
+        $this->actingAs($owner)->get(route('admin.pages.preview', $page))->assertOk();
+    }
+
     public function test_a_page_record_redirects_to_its_builder(): void
     {
         $owner = User::query()->where('email', 'owner@reimaginos.test')->firstOrFail();

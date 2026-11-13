@@ -17,6 +17,18 @@ BASE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
 VENDOR = os.path.join(BASE, "vendor")
 OUT = os.path.join(BASE, "tools", "wasm", "psr4.php")
 
+# Composer is unavailable, so the entry point Laravel's public/index.php expects
+# (vendor/autoload.php) is written here as a thin proxy onto the generated map.
+COMPOSER_ENTRY = os.path.join(VENDOR, "autoload.php")
+COMPOSER_ENTRY_SOURCE = """<?php
+/*
+ * Stand-in for Composer's generated autoloader (written by
+ * tools/wasm/gen-autoload.py). Regenerate with `npm run autoload`.
+ */
+
+return require dirname(__DIR__).'/tools/wasm/autoload.php';
+"""
+
 # Fallbacks for packages that declare no psr-4 autoload at all.
 EXTRA_PSR4 = {
     "sebastian/version": {"SebastianBergmann\\Version\\": "src"},
@@ -157,6 +169,11 @@ def main():
         fh.write("$classmap = " + php_array(classes) + ";\n")
         fh.write("$files = " + php_array(files) + ";\n")
         fh.write("return ['psr4' => $psr4, 'classmap' => $classmap, 'files' => $files];\n")
+
+
+    os.makedirs(VENDOR, exist_ok=True)
+    with open(COMPOSER_ENTRY, "w", encoding="utf-8") as fh:
+        fh.write(COMPOSER_ENTRY_SOURCE)
 
     print(f"{len(psr4)} psr-4 prefixes, {len(classes)} classmap symbols, {len(files)} files")
 
