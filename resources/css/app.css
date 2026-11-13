@@ -1,0 +1,82 @@
+@import 'tailwindcss';
+@plugin '@tailwindcss/forms';
+@plugin '@tailwindcss/typography';
+
+/*
+ * Reimagin OS design tokens.
+ *
+ * Walnut + brass palette: a furniture studio's material language rather than a
+ * generic admin blue. Brand = brass/amber, ink = warm charcoal.
+ */
+@theme {
+    --color-brand-50: #fdf6ee;
+    --color-brand-100: #f8e7d3;
+    --color-brand-200: #f0cca6;
+    --color-brand-300: #e5ac74;
+    --color-brand-400: #d98e4d;
+    --color-brand-500: #c87a42;
+    --color-brand-600: #ad6132;
+    --color-brand-700: #8c4c28;
+    --color-brand-800: #6f3d22;
+    --color-brand-900: #5a331e;
+
+    --color-ink-50: #f7f6f4;
+    --color-ink-100: #eeece8;
+    --color-ink-150: #e4e1db;
+    --color-ink-200: #d8d4cc;
+    --color-ink-300: #bbb5a9;
+    --color-ink-400: #948d80;
+    --color-ink-500: #746d61;
+    --color-ink-600: #5b554b;
+    --color-ink-700: #453f38;
+    --color-ink-800: #2f2b26;
+    --color-ink-900: #1f1c19;
+    --color-ink-950: #141210;
+
+    --font-display: 'Fraunces', 'Iowan Old Style', Georgia, serif;
+    --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+
+    --shadow-panel: 0 1px 2px rgb(20 18 16 / 0.06), 0 8px 24px -12px rgb(20 18 16 / 0.18);
+}
+
+@layer base {
+    [x-cloak] {
+        display: none !important;
+    }
+
+    body {
+        font-family: var(--font-sans);
+        -webkit-font-smoothing: antialiased;
+    }
+
+    .font-display {
+        font-family: var(--font-display);
+        font-optical-sizing: auto;
+    }
+}
+
+@layer components {
+    /* Builder canvas: block outlines appear only while hovering or selected. */
+    .builder-block {
+        position: relative;
+        outline: 2px dashed transparent;
+        outline-offset: -2px;
+        transition: outline-color 120ms ease;
+    }
+
+    .builder-block:hover {
+        outline-color: var(--color-brand-300);
+    }
+
+    .builder-block[data-selected='true'] {
+        outline: 2px solid var(--color-brand-500);
+    }
+
+    .builder-drag {
+        cursor: grab;
+    }
+
+    .builder-drag:active {
+        cursor: grabbing;
+    }
+}
